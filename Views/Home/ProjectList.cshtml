@@ -1,0 +1,301 @@
+﻿
+@{
+    ViewBag.Title = "ProjectList";
+}
+@model CRUDdemo.Models.clsCommon
+<html lang="en">
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <style>
+
+        .noborder {
+            border-top: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Trigger the modal with a button -->
+        <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" style=" margin-top: 11px; ">Create Project</button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" onclick="ClearData()">&times;</button>
+                        <h4 class="modal-title">Create Project</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <table class="table ">
+                                <tr>
+                                    <td class="noborder">
+                                        Project Name:<span style="color:red">*</span>
+                                    </td>
+                                    <td class="noborder">
+                                        <input type="text" id="strProjectName" title="Project Name" class="form-control" name="strProject" style="padding-left: 5px;padding-right: 5px;" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="noborder">
+                                        Developement Start Date:<span style="color:red">*</span>
+                                    </td>
+                                    <td class="noborder">
+                                        <input type='text' class="form-control" id='dtDevelopementStartDate' title="Development Start Date" />
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="noborder">
+                                        Project Logo: <span style="color:red">*</span>
+                                    </td>
+                                    <td class="noborder">
+                                        <input type="file" id="strFile" title="Upload image" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="noborder">
+                                        <img src="" id="img" height="50px" width="50px" style="display:none" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" onclick="InsertData()" class="btn btn-default">
+                        <input type="hidden" id="intId" value="0" />
+                        <button type="button" class="btn btn-default" data-dismiss="modal" onclick="ClearData()">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="table-responsive" id="tblBody">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>Project Name</th>
+                        <th>Development Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.LSTList != null && Model.LSTList.Count > 0)
+                    {
+                        foreach (var item in Model.LSTList)
+                        {
+                            <tr>
+                                <td><img src="/Image/@item.strFile" height="50px" width="50px" /></td>
+                                <td>@item.strProjectName</td>
+                                <td>@Convert.ToDateTime(item.dtDevelopementStartDate).ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <a onclick="EditData(@item.intProjectId)" style="margin-right: 3px;" data-target="#myModal" data-toggle="modal"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                    <a onclick="DeleteData(@item.intProjectId)" style="margin-right: 3px;">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                    @if (item.isActive == true)
+                                    {
+                                        <a onclick="UpdateStatus(@item.intProjectId)" style="margin-right: 3px;">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a onclick="UpdateStatus(@item.intProjectId)" style="margin-right: 3px;">
+                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                        </a>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align:center">No Record Found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+<!-- Bootstrap Date-Picker Plugin -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
+<script>
+    $(document).ready(function () {
+        $.noConflict(true);
+        $('#dtDevelopementStartDate').datepicker();
+    });
+
+</script>
+<script>
+
+    function InsertData() {
+        var id = document.getElementById('intId').value;
+        var strProjectName = $("#strProjectName").val();
+        var dtDevelopementStartDate = $("#dtDevelopementStartDate").val();
+        var strFile = document.getElementById("strFile").files[0];
+        if (strProjectName == "") {
+            alert("Please Enter Project Name");
+            return;
+        }
+        if (dtDevelopementStartDate == "") {
+            alert("Please Enter Development Date");
+            return;
+        }
+        var reg = /(.*?)\.(jpg|bmp|jpeg|png)$/;
+        if (!strFile.match(reg)) {
+            alert("Invalid File");
+            return false;
+        }
+        var formdata = new FormData();
+        formdata.append("strProjectName", strProjectName);
+        formdata.append("strDate", dtDevelopementStartDate);
+        formdata.append("file", strFile);
+        formdata.append("intProjectId", id);
+        $.ajax({
+            type: "POST",
+            url: "/Home/InsertData",
+            contentType: "application/json; charset=utf-8",
+            data: formdata,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data == "Insert") {
+                    alert("Project Inserted Successfully");
+                    location.reload();
+                }
+                else if (data == "Update") {
+                    alert("Project updated Successfully");
+                    location.reload();
+                }
+                else if (data == "exist") {
+                    alert("Project name is already exist");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+                ClearData();
+            },
+            error: function (xhr) {
+                alert(xhr);
+            }
+        });
+    }
+    function EditData(id) {
+        var cls = {
+            intProjectId: id,
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/getData",
+            dataType: 'json',
+            data: cls,
+            success: function (data) {
+                if (data != null) {
+                    document.getElementById('intId').value = id;
+                    document.getElementById('strProjectName').value = data.ProjectName;
+                    document.getElementById('dtDevelopementStartDate').value = ConvertRazorToDate(data.DevelopementStartDate);
+                    document.getElementById('img').style.display = "block";
+                    document.getElementById('img').src = "/Image/" + data.ProjectLogo + "";
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (xhr) {
+                alert(xhr);
+            }
+        });
+    }
+    function DeleteData(id) {
+        var cls = {
+            intProjectId: id,
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Home/DeleteData",
+            dataType: 'json',
+            data: cls,
+            success: function (data) {
+                if (data == "success") {
+                    alert("Project deleted successfully");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (xhr) {
+                alert(xhr);
+            }
+        });
+    }
+    function UpdateStatus(id) {
+        var cls = {
+            intProjectId: id,
+        }
+        $.ajax({
+            type: "POST",
+            url: "/Home/UpdateStatus",
+            dataType: 'json',
+            data: cls,
+            success: function (data) {
+                if (data == "success") {
+                    alert("Project Status updated successfully");
+                    location.reload();
+                }
+                else {
+                    alert("error");
+                }
+            },
+            error: function (xhr) {
+                alert(xhr);
+            }
+        });
+    }
+    function ClearData() {
+        document.getElementById('strProjectName').value = "";
+        document.getElementById('dtDevelopementStartDate').value = "";
+        document.getElementById('img').style.display = "none";
+        document.getElementById('img').src = "";
+        document.getElementById('intId').value = 0;
+    }
+    function ConvertRazorToDate(date) {
+        if (date != null) {
+            var value = new Date(parseInt(date.substr(6)))
+            var d = value.getDate();
+            var m = value.getMonth() + 1;
+            var y = value.getFullYear();
+            if (d < 10) {
+                d = '0' + d;
+            }
+            if (m < 10) {
+                m = '0' + m;
+            }
+            return d + '/' + m + '/' + y;
+        }
+        else {
+            return '';
+        }
+    }
+</script>
+

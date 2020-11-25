@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ordesignerObjectsDiagram dslVersion="1.0.0.0" absoluteBounds="0, 0, 11, 8.5" name="CRUDdb">
+  <DataContextMoniker Name="/CRUDdbDataContext" />
+  <nestedChildShapes>
+    <classShape Id="bb480718-35b1-4412-9a72-9eaec92a8c39" isExpanded="false" absoluteBounds="0.625, 0.5, 2, 0.45">
+      <DataClassMoniker Name="/CRUDdbDataContext/tblProject" />
+      <nestedChildShapes>
+        <elementListCompartment Id="34c3fb24-2cb4-41a7-9ae1-f18826140ad6" absoluteBounds="0.63999999999999968, 0.96, 1.9700000000000002, 1.2108968098958333" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
+  </nestedChildShapes>
+</ordesignerObjectsDiagram>
